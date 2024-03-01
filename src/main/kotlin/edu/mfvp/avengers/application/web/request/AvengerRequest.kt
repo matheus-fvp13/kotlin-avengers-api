@@ -17,7 +17,8 @@ data class AvengerRequest(
     val description: String? = "",
     val history: String? = ""
 ) {
-    fun toAvenger() = Avenger(
+    fun toAvenger(id: Long? = null) = Avenger(
+        id = id,
         nick = nick,
         person = person,
         description = description,

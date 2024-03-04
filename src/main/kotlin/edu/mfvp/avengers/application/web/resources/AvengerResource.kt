@@ -2,9 +2,9 @@ package edu.mfvp.avengers.application.web.resources
 
 import edu.mfvp.avengers.application.web.request.AvengerRequest
 import edu.mfvp.avengers.application.web.response.AvengerResponse
-import edu.mfvp.avengers.domain.repositories.AvengerRepository
+import edu.mfvp.avengers.domain.gateway.AvengerGateway
 import jakarta.validation.Valid
-import org.springframework.http.HttpStatus
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -20,40 +20,40 @@ private const val API_PATH = "/v1/api/avenger"
 @RestController
 @RequestMapping(API_PATH)
 class AvengerResource(
-    private val repository: AvengerRepository
+    private val avengerGateway: AvengerGateway
 ) {
     @GetMapping
-    fun getAvengers() = repository.getAvengers()
+    fun getAvengers() = avengerGateway.getAvengers()
         .map { AvengerResponse.from(it) }
         .let { ResponseEntity.ok().body(it) }
 
     @GetMapping("/{id}/detail")
     fun gerAvengerDetails(@PathVariable id: Long) =
-        repository.getDetail(id)?.let {
+        avengerGateway.getDetail(id)?.let {
             ResponseEntity.ok().body(AvengerResponse.from(it))
         } ?: ResponseEntity.notFound().build<Void>()
 
     @PostMapping
     fun createAvenger(@Valid @RequestBody request: AvengerRequest) =
         request.toAvenger().run {
-            repository.create(this)
+            avengerGateway.create(this)
         }.let {
             ResponseEntity.created(URI("$API_PATH/${it.id}")).body(AvengerResponse.from(it))
         }
 
     @PutMapping("/{id}")
     fun updateAvenger(@PathVariable id: Long, @Valid @RequestBody request: AvengerRequest) =
-        repository.getDetail(id)?.let {
+        avengerGateway.getDetail(id)?.let {
             request.toAvenger(id).apply {
-                repository.update(this)
+                avengerGateway.update(this)
             }.let {
-                ResponseEntity.noContent()
+                ResponseEntity.noContent().build()
             }
         } ?: ResponseEntity.notFound().build<Void>()
 
     @DeleteMapping("/{id}")
     fun deleteAvenger(@PathVariable id: Long) =
-        repository.delete(id).let {
+        avengerGateway.delete(id).let {
             ResponseEntity.accepted().build<Void>()
         }
 }

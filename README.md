@@ -26,4 +26,10 @@ classDiagram
 - Docker
 - Maven
 
+# Autor
+
+Matheus Fernando Vieira Pinto
+
+https://www.linkedin.com/in/matheus-fvp/
+
 
